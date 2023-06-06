@@ -1,6 +1,10 @@
 const express = require('express');
 const crypto = require('crypto');
 const { readData, existingId } = require('./middlewares/existingId');
+const { 
+  verifyInputs, 
+  validateEmailInput, 
+  validatePasswordInput } = require('./middlewares/validateLogin');
 
 const app = express();
 app.use(express.json());
@@ -37,7 +41,7 @@ app.get('/talker/:id', existingId, async (req, res) => {
   res.json(talker.find((t) => t.id === Number(req.params.id))); 
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', verifyInputs, validateEmailInput, validatePasswordInput, (req, res) => {
   const { email, password } = req.body;
   const getToken = token();
   const loginBody = {
