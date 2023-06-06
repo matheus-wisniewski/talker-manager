@@ -1,4 +1,3 @@
-/* eslint-disable quote-props */
 const dataPath = '../talker.json';
 const fs = require('fs').promises;
 const path = require('path');
