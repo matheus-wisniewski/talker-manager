@@ -40,6 +40,19 @@ app.listen(PORT, () => {
   console.log('Online');
 });
 
+app.get('/talker/search', validateToken, async (req, res) => {
+  const talker = await readData();
+  const { q } = req.query;
+  
+  if (!q || q.length === 0) {
+    return res.status(HTTP_OK_STATUS).json(talker);
+  }
+
+  const filteredTalkers = talker.filter((t) =>
+    t.name.includes(q));
+    res.status(HTTP_OK_STATUS).json(filteredTalkers);
+});
+
 app.get('/talker', async (req, res) => {
   const talkerData = await readData();
   if (talkerData) {
