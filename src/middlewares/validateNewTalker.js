@@ -55,24 +55,28 @@ const validateAgeInput = (req, res, next) => {
 const validateTalkInput = (req, res, next) => {
   const { talk } = req.body;
   const talkError = 'O campo "talk" é obrigatório';
-  const watchedAtError = 'O campo "watchedAt" é obrigatório';
-  const rateError = 'O campo "rate" é obrigatório';
+  // const watchedAtError = 'O campo "watchedAt" é obrigatório';
+  // const rateError = 'O campo "rate" é obrigatório';
 
   if (!talk) {
     res.status(HTTP_BAD_REQUEST).json({ message: talkError });
-  } else if (!talk.watchedAt) {
-    res.status(HTTP_BAD_REQUEST).json({ message: watchedAtError });
-  } else if (!talk.rate) {
-    res.status(HTTP_BAD_REQUEST).json({ message: rateError });
-  } else {
-    next();
+  // } else if (!talk.watchedAt) {
+  //   res.status(HTTP_BAD_REQUEST).json({ message: watchedAtError });
+  // } else if (!talk.rate) {
+  //   res.status(HTTP_BAD_REQUEST).json({ message: rateError });
+  // } else {
   }
+  next();
 };
 
 const validateWatchedAt = (req, res, next) => {
   const { talk: { watchedAt } } = req.body;
   const watchedAtDateFormatError = 'O campo "watchedAt" deve ter o formato "dd/mm/aaaa"';
+  const watchedAtError = 'O campo "watchedAt" é obrigatório';
   const verifyDateFormat = valideAgeFormat(watchedAt);
+  if (!watchedAt) {
+    return res.status(HTTP_BAD_REQUEST).json({ message: watchedAtError });
+  }
 
   if (!verifyDateFormat) {
     res.status(HTTP_BAD_REQUEST).json({ message: watchedAtDateFormatError });
@@ -81,12 +85,20 @@ const validateWatchedAt = (req, res, next) => {
   }
 };
 
+const qualquerNome = (rate, res) => {
+  const rateError = 'O campo "rate" é obrigatório';
+  
+  if (!rate && rate !== 0) {
+    res.status(HTTP_BAD_REQUEST).json({ message: rateError });
+  }
+};
+
 const validateRate = (req, res, next) => {
   const { talk: { rate } } = req.body;
   const rateToInteger = Number.isInteger(rate);
   const rateMinAndMax = (rate > 0 && rate <= 5);
   const rateNumberError = 'O campo "rate" deve ser um número inteiro entre 1 e 5';
-
+  qualquerNome(rate, res);
   if (!rateToInteger || !rateMinAndMax) {
     res.status(HTTP_BAD_REQUEST).json({ message: rateNumberError });
   } else {
