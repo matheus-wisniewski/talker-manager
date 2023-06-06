@@ -1,3 +1,5 @@
+const fs = require('fs').promises;
+const path = require('path');
 const express = require('express');
 const crypto = require('crypto');
 const { readData, existingId } = require('./middlewares/existingId');
@@ -5,11 +7,21 @@ const {
   verifyInputs, 
   validateEmailInput, 
   validatePasswordInput } = require('./middlewares/validateLogin');
+const { 
+  validateToken, 
+  validateNameInput, 
+  validateAgeInput, 
+  validateTalkInput, 
+  validateWatchedAt, 
+  validateRate } = require('./middlewares/validateNewTalker');
+
+const dataPath = '../talker.json';
 
 const app = express();
 app.use(express.json());
 
 const HTTP_OK_STATUS = 200;
+const HTTP_CREATED_STATUS = 201;
 const PORT = process.env.PORT || '3001';
 
 const token = () => {
@@ -52,4 +64,29 @@ app.post('/login', verifyInputs, validateEmailInput, validatePasswordInput, (req
   if (loginBody) {
     res.status(HTTP_OK_STATUS).json({ token: getToken });
   }
+});
+
+app.post('/talker', 
+validateToken, validateNameInput, 
+validateAgeInput, validateTalkInput,
+validateWatchedAt, validateRate,
+
+async (req, res) => {
+  const { name, age, talk: { watchedAt, rate } } = req.body;
+  const talker = await readData();
+
+  const newTalker = {
+    id: talker.length + 1,
+    name,
+    age,
+    talk: {
+      watchedAt,
+      rate,
+    },
+  };
+  talker.push(newTalker);
+  fs.writeFile(path.resolve(__dirname, dataPath),
+  JSON.stringify(talker));
+
+  return res.status(HTTP_CREATED_STATUS).json(newTalker);
 });
