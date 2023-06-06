@@ -78,7 +78,7 @@ const validateWatchedAt = (req, res, next) => {
   }
 };
 
-const qualquerNome = (rate, res) => {
+const validateRateInput = (rate, res) => {
   const rateError = 'O campo "rate" é obrigatório';
   
   if (!rate && rate !== 0) {
@@ -91,7 +91,7 @@ const validateRate = (req, res, next) => {
   const rateToInteger = Number.isInteger(rate);
   const rateMinAndMax = (rate > 0 && rate <= 5);
   const rateNumberError = 'O campo "rate" deve ser um número inteiro entre 1 e 5';
-  qualquerNome(rate, res);
+  validateRateInput(rate, res);
   if (!rateToInteger || !rateMinAndMax) {
     res.status(HTTP_BAD_REQUEST).json({ message: rateNumberError });
   } else {

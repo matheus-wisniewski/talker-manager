@@ -15,9 +15,7 @@ const existingId = async (req, res, next) => {
   const talker = await readData();
   const id = Number(req.params.id);
   if (!talker.some((t) => t.id === id)) {
-    return res.status(404).json({ 
-      message: 'Pessoa palestrante não encontrada', 
-    });
+    return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   }
   next();
 };

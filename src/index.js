@@ -89,3 +89,28 @@ async (req, res) => {
 
   return res.status(HTTP_CREATED_STATUS).json(newTalker);
 });
+
+app.put('/talker/:id', 
+validateToken, validateNameInput, 
+validateAgeInput, validateTalkInput,
+validateWatchedAt, validateRate, existingId,
+async (req, res) => {
+  const { name, age, talk: { watchedAt, rate } } = req.body;
+  const talker = await readData();
+  const { id } = req.params;
+  const updateTalker = talker.map((t) => {
+    if (t.id === +id) {
+      return {
+        ...t,
+        name,
+        age,
+        talk: {
+          watchedAt,
+          rate },
+        };
+      } return t; 
+  }); fs.writeFile(path.resolve(__dirname, dataPath), JSON.stringify(updateTalker));
+    const newTalkerList = updateTalker.find((t) => t.id === +id);
+
+    return res.status(HTTP_OK_STATUS).json(newTalkerList);
+});
