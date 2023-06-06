@@ -22,6 +22,7 @@ app.use(express.json());
 
 const HTTP_OK_STATUS = 200;
 const HTTP_CREATED_STATUS = 201;
+const HTTP_NO_CONTENT_SUCCESS = 204;
 const PORT = process.env.PORT || '3001';
 
 const token = () => {
@@ -113,4 +114,12 @@ async (req, res) => {
     const newTalkerList = updateTalker.find((t) => t.id === +id);
 
     return res.status(HTTP_OK_STATUS).json(newTalkerList);
+});
+
+app.delete('/talker/:id', validateToken, async (req, res) => {
+  const talker = await readData();
+  const { id } = req.params;
+  const deleteTalker = talker.filter((t) => t.id !== +id);
+  fs.writeFile(path.resolve(__dirname, dataPath), JSON.stringify(deleteTalker));
+  res.status(HTTP_NO_CONTENT_SUCCESS).json(deleteTalker);
 });
