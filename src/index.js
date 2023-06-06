@@ -15,7 +15,7 @@ const {
   validateWatchedAt, 
   validateRate } = require('./middlewares/validateNewTalker');
 
-const dataPath = '../talker.json';
+const dataPath = './talker.json';
 
 const app = express();
 app.use(express.json());
@@ -85,8 +85,7 @@ async (req, res) => {
     },
   };
   talker.push(newTalker);
-  fs.writeFile(path.resolve(__dirname, dataPath),
-  JSON.stringify(talker));
+  fs.writeFile(path.resolve(__dirname, dataPath), JSON.stringify(talker));
 
   return res.status(HTTP_CREATED_STATUS).json(newTalker);
 });

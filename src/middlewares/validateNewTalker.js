@@ -55,16 +55,9 @@ const validateAgeInput = (req, res, next) => {
 const validateTalkInput = (req, res, next) => {
   const { talk } = req.body;
   const talkError = 'O campo "talk" é obrigatório';
-  // const watchedAtError = 'O campo "watchedAt" é obrigatório';
-  // const rateError = 'O campo "rate" é obrigatório';
 
   if (!talk) {
     res.status(HTTP_BAD_REQUEST).json({ message: talkError });
-  // } else if (!talk.watchedAt) {
-  //   res.status(HTTP_BAD_REQUEST).json({ message: watchedAtError });
-  // } else if (!talk.rate) {
-  //   res.status(HTTP_BAD_REQUEST).json({ message: rateError });
-  // } else {
   }
   next();
 };
