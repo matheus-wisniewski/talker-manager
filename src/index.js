@@ -1,22 +1,11 @@
 const express = require('express');
-const fs = require('fs').promises;
-const path = require('path');
+const { readData, existingId } = require('./middlewares/existingId');
 
 const app = express();
 app.use(express.json());
 
 const HTTP_OK_STATUS = 200;
 const PORT = process.env.PORT || '3001';
-const dataPath = './talker.json';
-
-const readData = async () => {
-  try {
-    const read = await fs.readFile(path.resolve(__dirname, dataPath), 'utf-8');
-    return JSON.parse(read);
-  } catch (err) {
-    console.error(err);
-  }
-};
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
@@ -34,4 +23,9 @@ app.get('/talker', async (req, res) => {
   } else {
     return [];
   }
+});
+
+app.get('/talker/:id', existingId, async (req, res) => {
+  const talker = await readData();
+  res.json(talker.find((t) => t.id === Number(req.params.id))); 
 });
