@@ -14,7 +14,9 @@ const {
   validateTalkInput, 
   validateWatchedAt, 
   validateRate, 
-  verifyJustDate } = require('./middlewares/validateNewTalker');
+  verifyJustDate, 
+  newCheckRate, 
+  newCheckDecimalRate } = require('./middlewares/validateNewTalker');
 const { getRateFromURL, getQFromURL } = require('./middlewares/searchURL');
 const connection = require('./db/connection');
 
@@ -45,6 +47,7 @@ app.listen(PORT, () => {
 
 app.get('/talker/db', async (req, res) => {
   const [result] = await connection.execute('SELECT * FROM TalkerDB.talkers');
+
   const talkerList = result.map((t) => ({
       age: t.age,
       id: t.id,
@@ -78,6 +81,7 @@ getQFromURL, getRateFromURL, async (req, res) => {
 
 app.get('/talker', async (req, res) => {
   const talkerData = await readData();
+
   if (talkerData) {
     res.status(HTTP_OK_STATUS).json(talkerData);
   } else {
@@ -85,8 +89,29 @@ app.get('/talker', async (req, res) => {
   }
 });
 
+app.patch('/talker/rate/:id', validateToken, 
+newCheckRate, newCheckDecimalRate, async (req, res) => {
+  const talker = await readData(); 
+  const { rate } = req.body;
+  const { id } = req.params;
+
+  const newTalkersList = talker.map((t) => {
+    if (t.id === +id) {
+      return { 
+        ...t,
+        talk: {
+          ...t.talk,
+          rate } }; 
+    } return t;
+  });
+  fs.writeFile(path.resolve(__dirname, dataPath), JSON.stringify(newTalkersList));
+
+  return res.status(HTTP_NO_CONTENT_SUCCESS).json({});
+});
+
 app.get('/talker/:id', existingId, async (req, res) => {
   const talker = await readData();
+
   res.json(talker.find((t) => t.id === Number(req.params.id))); 
 });
 
@@ -121,6 +146,7 @@ async (req, res) => {
       rate,
     },
   };
+  
   talker.push(newTalker);
   fs.writeFile(path.resolve(__dirname, dataPath), JSON.stringify(talker));
 
@@ -156,6 +182,8 @@ app.delete('/talker/:id', validateToken, async (req, res) => {
   const talker = await readData();
   const { id } = req.params;
   const deleteTalker = talker.filter((t) => t.id !== +id);
+
   fs.writeFile(path.resolve(__dirname, dataPath), JSON.stringify(deleteTalker));
+  
   res.status(HTTP_NO_CONTENT_SUCCESS).json(deleteTalker);
 });

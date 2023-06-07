@@ -83,7 +83,7 @@ const validateRateInput = (rate, res) => {
   
   if (!rate && rate !== 0) {
     res.status(HTTP_BAD_REQUEST).json({ message: rateError });
-  }
+  } 
 };
 
 const validateRate = (req, res, next) => {
@@ -112,6 +112,31 @@ const verifyJustDate = (req, res, next) => {
   }
 };
 
+// São funções quase idênticas às de cima, mas se eu uso as de cima meu teste do req 11 quebra
+// e se eu tento arrumar elas outros req quebram 
+const newCheckRate = (req, res, next) => {
+  const { rate } = req.body;
+  const rateError = 'O campo "rate" é obrigatório';
+
+  if (rate !== 0 && !rate) {
+    res.status(HTTP_BAD_REQUEST).json({ message: rateError });
+  } else {
+    next();
+  }
+};
+
+const newCheckDecimalRate = (req, res, next) => {
+    const { rate } = req.body;
+    const isRateInteger = Number.isInteger(rate);
+    const rateNumberError = 'O campo "rate" deve ser um número inteiro entre 1 e 5';
+    const isRateBetweenOneAndFive = (rate > 0 && rate < 6);
+    if (!isRateInteger || !isRateBetweenOneAndFive) {
+      res.status(HTTP_BAD_REQUEST).json({ message: rateNumberError });
+    } else {
+      next();
+    }
+  };
+
 module.exports = {
   validateAgeInput,
   validateNameInput,
@@ -121,4 +146,6 @@ module.exports = {
   validateRate,
   valideAgeFormat,
   verifyJustDate,
+  newCheckRate,
+  newCheckDecimalRate,
 };
