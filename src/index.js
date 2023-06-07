@@ -16,6 +16,7 @@ const {
   validateRate, 
   verifyJustDate } = require('./middlewares/validateNewTalker');
 const { getRateFromURL, getQFromURL } = require('./middlewares/searchURL');
+const connection = require('./db/connection');
 
 const dataPath = './talker.json';
 
@@ -40,6 +41,21 @@ app.get('/', (_request, response) => {
 
 app.listen(PORT, () => {
   console.log('Online');
+});
+
+app.get('/talker/db', async (req, res) => {
+  const [result] = await connection.execute('SELECT * FROM TalkerDB.talkers');
+  const talkerList = result.map((t) => ({
+      age: t.age,
+      id: t.id,
+      name: t.name,
+      talk: {
+        rate: t.talk_rate,
+        watchedAt: t.talk_watched_at,
+      },
+    }));
+
+  res.status(HTTP_OK_STATUS).json(talkerList);
 });
 
 app.get('/talker/search', 

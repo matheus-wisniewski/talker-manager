@@ -32,7 +32,8 @@ services:
       MYSQL_USER: root
       MYSQL_PASSWORD: password
       MYSQL_DATABASE: TalkerDB
-
+    env_file:
+      - .env
   db:
     container_name: talker_manager_db
     image: mysql:8.0.32
