@@ -99,6 +99,19 @@ const validateRate = (req, res, next) => {
   }
 };
 
+const verifyJustDate = (req, res, next) => {
+  const { date } = req.query;
+  const watchedAtDateFormatError = 'O parâmetro "date" deve ter o formato "dd/mm/aaaa"';
+  const dateRegex = /^[0-9]{2}\/[0-9]{2}\/[0-9]{4}$/;
+  const verifyDateFormat = dateRegex.test(date);
+
+  if (date && !verifyDateFormat) {
+    res.status(HTTP_BAD_REQUEST).json({ message: watchedAtDateFormatError });
+  } else {
+    next();
+  }
+};
+
 module.exports = {
   validateAgeInput,
   validateNameInput,
@@ -106,4 +119,6 @@ module.exports = {
   validateToken,
   validateWatchedAt,
   validateRate,
+  valideAgeFormat,
+  verifyJustDate,
 };

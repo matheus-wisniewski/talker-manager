@@ -13,7 +13,8 @@ const {
   validateAgeInput, 
   validateTalkInput, 
   validateWatchedAt, 
-  validateRate } = require('./middlewares/validateNewTalker');
+  validateRate, 
+  verifyJustDate } = require('./middlewares/validateNewTalker');
 const { getRateFromURL, getQFromURL } = require('./middlewares/searchURL');
 
 const dataPath = './talker.json';
@@ -41,25 +42,22 @@ app.listen(PORT, () => {
   console.log('Online');
 });
 
-app.get('/talker/search', validateToken, getRateFromURL, getQFromURL, async (req, res) => {
+app.get('/talker/search', 
+validateToken, verifyJustDate, 
+getQFromURL, getRateFromURL, async (req, res) => {
   const talker = await readData();
-  const { q, rate } = req.query;
-  
-  if (rate && q) {
-    const filterByRQ = talker.filter((t) => 
-    t.name.includes(q) && t.talk.rate === Number(rate));
-    return res.status(HTTP_OK_STATUS).json(filterByRQ);
-  }
-  
+  const { q, rate, date } = req.query;
+  let toReturn = talker;
+
   if (rate) {
-    const filterByRate = talker.filter((t) => t.talk.rate === Number(rate));
-    return res.status(HTTP_OK_STATUS).json(filterByRate);
+    toReturn = toReturn.filter((t) => t.talk.rate === Number(rate));
+  } if (q) {
+    toReturn = toReturn.filter((t) => t.name.includes(q));
+  } if (date) {
+   toReturn = toReturn.filter((t) => t.talk.watchedAt === date);
   }
-  
-  if (q) {
-    const filterByQ = talker.filter((t) => t.name.includes(q));
-    res.status(HTTP_OK_STATUS).json(filterByQ);
-  }
+
+  return res.status(HTTP_OK_STATUS).json(toReturn);
 });
 
 app.get('/talker', async (req, res) => {
